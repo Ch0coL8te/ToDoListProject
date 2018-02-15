@@ -1,3 +1,8 @@
+
+let data = {
+  todo: [],
+  completed: []
+}
 // Remove and complete icons in SVG format
 let removeSVG =
   '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 22 22" style="enable-background:new 0 0 22 22;" xml:space="preserve"> <g> <g> <path class="fill" d="M16.1,3.6h-1.9V3.3c0-1.3-1-2.3-2.3-2.3h-1.7C8.9,1,7.8,2,7.8,3.3v0.2H5.9c-1.3,0-2.3,1-2.3,2.3v1.3 c0,0.5,0.4,0.9,0.9,1v10.5c0,1.3,1,2.3,2.3,2.3h8.5c1.3,0,2.3-1,2.3-2.3V8.2c0.5-0.1,0.9-0.5,0.9-1V5.9 C18.4,4.6,17.4,3.6,16.1,3.6z M9.1,3.3c0-0.6,0.5-1.1,1.1-1.1h1.7c0.6,0,1.1,0.5,1.1,1.1v0.2H9.1V3.3z M16.3,18.7 c0,0.6-0.5,1.1-1.1,1.1H6.7c-0.6,0-1.1-0.5-1.1-1.1V8.2h10.6L16.3,18.7L16.3,18.7z M17.2,7H4.8V5.9c0-0.6,0.5-1.1,1.1-1.1h10.2 c0.6,0,1.1,0.5,1.1,1.1V7z"/> </g> <g> <g> <path class="fill" d="M11,18c-0.4,0-0.6-0.3-0.6-0.6v-6.8c0-0.4,0.3-0.6,0.6-0.6s0.6,0.3,0.6,0.6v6.8C11.6,17.7,11.4,18,11,18z"/> </g> <g> <path class="fill" d="M8,18c-0.4,0-0.6-0.3-0.6-0.6v-6.8C7.4,10.2,7.7,10,8,10c0.4,0,0.6,0.3,0.6,0.6v6.8C8.7,17.7,8.4,18,8,18z"/> </g> <g> <path class="fill" d="M14,18c-0.4,0-0.6-0.3-0.6-0.6v-6.8c0-0.4,0.3-0.6,0.6-0.6c0.4,0,0.6,0.3,0.6,0.6v6.8 C14.6,17.7,14.3,18,14,18z"/> </g> </g> </g> </svg>';
@@ -11,6 +16,8 @@ document.getElementById('add').addEventListener('click', function () {
   if (value) {
     addItemTodo(value);
     document.getElementById("item").value = '';
+    // When a new element added - pushes it to data object's todo array
+    data.todo.push(value);    
   }
 });
 
@@ -18,7 +25,17 @@ document.getElementById('add').addEventListener('click', function () {
 function removeItem() { 
   let item = this.parentNode.parentNode;
   let parent = item.parentNode; 
-  
+  let id = parent.id;
+  let value = item.innerText;
+
+  // Deciding from which 'directory' of an item it should be removed
+  if (id === "todo") {
+    data.todo.splice(data.todo.indexOf(value), 1);
+  } else {
+    data.completed.splice(data.completed.indexOf(value), 1);
+  } 
+
+  // Actually removing an item
   parent.removeChild(item);
 }
 
@@ -26,11 +43,24 @@ function completeItem() {
   let item = this.parentNode.parentNode;
   let parent = item.parentNode;
   let id = parent.id;
+  let value = item.innerText;
+
+
+  // When item is completed - moves it from todo to completed array of data object
+  if (id === 'todo') {
+    data.todo.splice(data.todo.indexOf(value), 1);
+    data.completed.push(value);
+  } else {
+    data.completed.splice(data.completed.indexOf(value), 1);
+    data.todo.push(value);
+  }
+  
 
   // Check if the item should be added to the completed to re-added to the todo list
   let target = (id === 'todo') ? document.getElementById('completed') : document.getElementById('todo');
   
   parent.removeChild(item);
+  // Inserting and item in reverse order (newer first)
   target.insertBefore(item, target.childNodes[0]);
 }
 
